@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1014503794984",
+    "project_id": "sillarai-1dce6",
+    "storage_bucket": "sillarai-1dce6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014503794984:android:9d958baca25ce5c358881d",
+        "android_client_info": {
+          "package_name": "com.kathiravanagency.sillaraiadmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1qOJVTHTgR381wp-ZX524DZ7eI1psD1A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014503794984:android:17c0dd1a9853442158881d",
+        "android_client_info": {
+          "package_name": "com.kathiravanagency.sillaraiapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1qOJVTHTgR381wp-ZX524DZ7eI1psD1A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
