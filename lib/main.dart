@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:sillaraiadmin/firebase_options.dart';
 
 void main() async {
@@ -67,21 +68,94 @@ class _MyHomePageState extends State<MyHomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '🙍' + user['userName'] ?? 'No Name',
+                        '🙍' + (user['userName'] ?? 'No Name'),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '📱' + user['mobileNumber'] ?? 'No Mobile Number',
+                        '📱' + (user['mobileNumber'] ?? 'No Mobile Number'),
                         style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
-                  subtitle: Row(
+                  trailing: Icon(Icons.visibility),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserRequestsPage(
+                          userId: user.id,
+                          mobileNumber: user['mobileNumber'],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class UserRequestsPage extends StatelessWidget {
+  final String userId;
+  final String mobileNumber;
+
+  const UserRequestsPage({
+    super.key,
+    required this.userId,
+    required this.mobileNumber,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Requests for $mobileNumber'),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('requests')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No requests found'));
+          }
+          final requests = snapshot.data!.docs;
+          return ListView.builder(
+            itemCount: requests.length,
+            itemBuilder: (context, index) {
+              final request = requests[index];
+              final requestData = request.data() as Map<String, dynamic>;
+
+              // Convert timestamp to DateTime
+              Timestamp timestamp = requestData['timestamp'];
+              DateTime dateTime = timestamp.toDate();
+
+              // Format DateTime using intl package
+              String formattedDate =
+                  DateFormat('dd-MMM-yyyy, hh:mm a').format(dateTime);
+
+              return Card(
+                margin: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (user['isCoins'] == 'true') Text('Coins: Yes'),Text(' | '),
-                      if (user['isTen'] == 'true') Text('Ten: Yes'),Text(' | '),
-                      if (user['isTwenty'] == 'true') Text('twenty: Yes'),
+                      Text('Type: ${requestData['requestType']}'),
+                      Text('Amount: \₹${requestData['amount']}'),
+                      Text('Message: ${requestData['message']}'),
+                      Text('Status: ${requestData['status']}'),
+                      Text('Time: $formattedDate'),
                     ],
                   ),
                 ),
