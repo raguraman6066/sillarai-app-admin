@@ -143,7 +143,7 @@ class UserRequestsPage extends StatelessWidget {
 
               // Format DateTime using intl package
               String formattedDate =
-                  DateFormat('dd-MMM-yyyy, hh:mm a').format(dateTime);
+                  DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
 
               return Card(
                 margin: const EdgeInsets.all(8.0),
@@ -152,8 +152,7 @@ class UserRequestsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Type: ${requestData['requestType']}'),
-                      Text('Amount: \₹${requestData['amount']}'),
-                      Text('Message: ${requestData['message']}'),
+                      Text('Quantity: ${requestData['quantity']}'),
                       Text('Status: ${requestData['status']}'),
                       Text('Time: $formattedDate'),
                     ],
