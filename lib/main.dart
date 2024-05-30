@@ -98,8 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-class UserRequestsPage extends StatelessWidget {
+class UserRequestsPage extends StatefulWidget {
   final String userId;
   final String mobileNumber;
 
@@ -110,25 +109,30 @@ class UserRequestsPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  _UserRequestsPageState createState() => _UserRequestsPageState();
+}
 
+class _UserRequestsPageState extends State<UserRequestsPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Requests for $mobileNumber'),
+        title: Text('Requests for ${widget.mobileNumber}'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
             .collection('users')
-            .doc(userId)
+            .doc(widget.userId)
             .collection('requests')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No requests found'));
+            return Center(child: Text('No requests found'));
           }
           final requests = snapshot.data!.docs;
           return ListView.builder(
@@ -145,6 +149,8 @@ class UserRequestsPage extends StatelessWidget {
               String formattedDate =
                   DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
 
+              String selectedStatus = requestData['status'] ?? 'Pending'; // Default status
+
               return Card(
                 margin: const EdgeInsets.all(8.0),
                 child: ListTile(
@@ -152,9 +158,36 @@ class UserRequestsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Type: ${requestData['requestType']}'),
-                      Text('Quantity: ${requestData['quantity']}'),
-                      Text('Status: ${requestData['status']}'),
-                      Text('Time: $formattedDate'),
+                      Text('Amount: ${requestData['amount']}'),
+                       Text('Time: $formattedDate'),
+                      Row(
+                        children: [
+                          Text('Status'),SizedBox(width: 10,),
+                          Container(
+                     
+                            color: Colors.grey.shade200,
+                            child: DropdownButton<String>(
+                              
+                              value: selectedStatus,
+                              items: <String>['Pending', 'Paid', 'Completed']
+                                  .map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedStatus = newValue!;
+                                  // Update status in Firestore for the particular request
+                                  request.reference.update({'status': selectedStatus});
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                     
                     ],
                   ),
                 ),
